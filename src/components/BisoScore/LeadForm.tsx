@@ -18,9 +18,18 @@ export type LeadData = {
   empresa: string
   telefone: string
   plataforma: string
+  faturamento: number | null
 }
 
 const PLATFORMS = ['Shopify', 'VTEX', 'Nuvemshop', 'WooCommerce', 'Tray', 'Outro']
+
+const FATURAMENTO_OPTIONS = [
+  { label: 'Até R$ 100 mil/mês', value: 100000 },
+  { label: 'R$ 100k – R$ 500k/mês', value: 300000 },
+  { label: 'R$ 500k – R$ 2 milhões/mês', value: 1000000 },
+  { label: 'R$ 2M – R$ 10 milhões/mês', value: 5000000 },
+  { label: 'Acima de R$ 10 milhões/mês', value: 10000000 },
+]
 
 export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: LeadFormProps) {
   const [form, setForm] = useState<LeadData>({
@@ -29,17 +38,18 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
     empresa: '',
     telefone: '',
     plataforma: '',
+    faturamento: null,
   })
-  const [errors, setErrors] = useState<Partial<LeadData>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof LeadData, string>>>({})
   const [loading, setLoading] = useState(false)
 
-  function set(field: keyof LeadData, value: string) {
+  function set<K extends keyof LeadData>(field: K, value: LeadData[K]) {
     setForm((prev) => ({ ...prev, [field]: value }))
     setErrors((prev) => ({ ...prev, [field]: '' }))
   }
 
   function validate(): boolean {
-    const newErrors: Partial<LeadData> = {}
+    const newErrors: Partial<Record<keyof LeadData, string>> = {}
     if (!form.nome.trim()) newErrors.nome = 'Nome obrigatório'
     if (!form.email.trim()) newErrors.email = 'E-mail obrigatório'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = 'E-mail inválido'
@@ -60,12 +70,19 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
       empresa: form.empresa,
       telefone: form.telefone,
       plataforma: form.plataforma || 'Não informado',
+      faturamento: form.faturamento,
       url_loja: storeUrl,
       score_total: scoreTotal,
       respostas: answers,
       nivel,
       timestamp: new Date().toISOString(),
     })
+
+    // Melhoria 4: incrementar contador social
+    try {
+      const count = parseInt(localStorage.getItem('biso_diagnosticos_count') ?? '0', 10)
+      localStorage.setItem('biso_diagnosticos_count', String(count + 1))
+    } catch {}
 
     setLoading(false)
     onSubmit(form)
@@ -105,10 +122,7 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field
-            label="Nome completo"
-            error={errors.nome}
-          >
+          <Field label="Nome completo" error={errors.nome}>
             <input
               type="text"
               className="input-field"
@@ -148,7 +162,21 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
             />
           </Field>
 
-          <Field label="Plataforma de e-commerce">
+          <Field label="Faturamento mensal aproximado" hint="opcional">
+            <select
+              className="input-field"
+              value={form.faturamento ?? ''}
+              onChange={(e) => set('faturamento', e.target.value ? Number(e.target.value) : null)}
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="">Selecione uma faixa</option>
+              {FATURAMENTO_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Plataforma de e-commerce" hint="opcional">
             <select
               className="input-field"
               value={form.plataforma}

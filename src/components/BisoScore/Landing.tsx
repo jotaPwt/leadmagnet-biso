@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Store } from 'lucide-react'
 
@@ -7,9 +7,44 @@ type LandingProps = {
   initialUrl: string
 }
 
+const COUNTER_KEY = 'biso_diagnosticos_count'
+const BASE_COUNT = 1247
+
+function getOrInitCounter(): number {
+  try {
+    const raw = localStorage.getItem(COUNTER_KEY)
+    if (raw) return parseInt(raw, 10)
+    const initial = BASE_COUNT + Math.floor(Math.random() * 51)
+    localStorage.setItem(COUNTER_KEY, String(initial))
+    return initial
+  } catch {
+    return BASE_COUNT
+  }
+}
+
+function useCountUp(target: number, duration = 1200) {
+  const [value, setValue] = useState(0)
+  useEffect(() => {
+    if (target === 0) return
+    let frame: number
+    const start = performance.now()
+    function tick(now: number) {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      setValue(Math.round(progress * target))
+      if (progress < 1) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [target, duration])
+  return value
+}
+
 export function Landing({ onStart, initialUrl }: LandingProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState('')
+  const [counterTarget] = useState(() => getOrInitCounter())
+  const displayCount = useCountUp(counterTarget)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -122,11 +157,28 @@ export function Landing({ onStart, initialUrl }: LandingProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="text-sm mb-12"
+        className="text-sm mb-6"
         style={{ color: '#888', fontWeight: 500 }}
       >
         ✓ Gratuito&nbsp;&nbsp;·&nbsp;&nbsp;✓ Sem cadastro inicial&nbsp;&nbsp;·&nbsp;&nbsp;✓ Resultado em 2 minutos
       </motion.p>
+
+      {/* Social counter */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.35 }}
+        className="mb-8"
+        style={{ textAlign: 'center', marginTop: 4 }}
+      >
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 500, fontSize: 14, color: '#555' }}>
+          🔥{' '}
+          <span style={{ fontWeight: 700, color: '#FF0068' }}>
+            {Intl.NumberFormat('pt-BR').format(displayCount)}
+          </span>
+          {' '}e-commerces já descobriram seu score
+        </span>
+      </motion.div>
 
       {/* Social proof brands */}
       <motion.div

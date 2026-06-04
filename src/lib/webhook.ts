@@ -6,6 +6,7 @@ export type WebhookPayload = {
   empresa: string
   telefone: string
   plataforma: string
+  faturamento: number | null
   url_loja: string
   score_total: number
   respostas: {

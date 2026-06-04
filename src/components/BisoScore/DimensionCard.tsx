@@ -1,85 +1,194 @@
+import { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import type { DimensionResult } from '../../lib/scoring'
 
 type DimensionCardProps = {
   dimension: DimensionResult
   index: number
+  isOpen: boolean
+  onToggle: (key: string) => void
 }
 
-export function DimensionCard({ dimension, index }: DimensionCardProps) {
+export function DimensionCard({ dimension, index, isOpen, onToggle }: DimensionCardProps) {
   const fillPercent = (dimension.score / dimension.maxScore) * 100
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // Animate max-height for smooth expand/collapse
+  useEffect(() => {
+    const el = panelRef.current
+    if (!el) return
+    if (isOpen) {
+      el.style.maxHeight = el.scrollHeight + 'px'
+      el.style.opacity = '1'
+    } else {
+      el.style.maxHeight = '0px'
+      el.style.opacity = '0'
+    }
+  }, [isOpen])
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 + index * 0.1, ease: 'easeOut' }}
-      className="card p-5 flex flex-col gap-3"
+      className="card flex flex-col overflow-hidden"
     >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span style={{ fontSize: 22 }}>{dimension.icon}</span>
+      <div className="p-5 flex flex-col gap-3">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize: 22 }}>{dimension.icon}</span>
+            <span
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700,
+                fontSize: 14,
+                color: '#222',
+              }}
+            >
+              {dimension.name}
+            </span>
+          </div>
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 700,
-              fontSize: 14,
-              color: '#222',
+              fontSize: 15,
+              color: '#FF0068',
+              whiteSpace: 'nowrap',
             }}
           >
-            {dimension.name}
+            {dimension.score}/{dimension.maxScore}
           </span>
         </div>
-        <span
+
+        {/* Progress */}
+        <div className="progress-bar-track" style={{ height: 6 }}>
+          <motion.div
+            className="progress-bar-fill"
+            initial={{ width: 0 }}
+            animate={{ width: `${fillPercent}%` }}
+            transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: 'easeOut' }}
+          />
+        </div>
+
+        {/* Insight */}
+        <p
           style={{
             fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 700,
-            fontSize: 15,
-            color: '#FF0068',
-            whiteSpace: 'nowrap',
+            fontWeight: 400,
+            fontSize: 13,
+            color: '#555',
+            lineHeight: 1.55,
           }}
         >
-          {dimension.score}/{dimension.maxScore}
-        </span>
+          {dimension.insight}
+        </p>
+
+        {/* Bottom row: opportunity badge + action plan toggle */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          {dimension.hasOpportunity && (
+            <span
+              className="text-xs font-semibold px-3 py-1 rounded-full"
+              style={{
+                background: 'rgba(255, 140, 0, 0.1)',
+                color: '#FF8C00',
+                border: '1px solid rgba(255, 140, 0, 0.3)',
+                fontFamily: 'Montserrat, sans-serif',
+              }}
+            >
+              Oportunidade de melhoria
+            </span>
+          )}
+
+          {dimension.hasOpportunity && dimension.actionPlan.length > 0 && (
+            <button
+              onClick={() => onToggle(dimension.key)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#FF0068',
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 500,
+                fontSize: 13,
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'opacity 0.15s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+            >
+              {isOpen ? 'Fechar plano ↑' : 'Ver plano de ação →'}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Progress */}
-      <div className="progress-bar-track" style={{ height: 6 }}>
-        <motion.div
-          className="progress-bar-fill"
-          initial={{ width: 0 }}
-          animate={{ width: `${fillPercent}%` }}
-          transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: 'easeOut' }}
-        />
-      </div>
-
-      {/* Insight */}
-      <p
-        style={{
-          fontFamily: 'Montserrat, sans-serif',
-          fontWeight: 400,
-          fontSize: 13,
-          color: '#555',
-          lineHeight: 1.55,
-        }}
-      >
-        {dimension.insight}
-      </p>
-
-      {/* Opportunity badge */}
-      {dimension.hasOpportunity && (
-        <span
-          className="self-start text-xs font-semibold px-3 py-1 rounded-full"
+      {/* Expandable action plan panel */}
+      {dimension.hasOpportunity && dimension.actionPlan.length > 0 && (
+        <div
+          ref={panelRef}
           style={{
-            background: 'rgba(255, 140, 0, 0.1)',
-            color: '#FF8C00',
-            border: '1px solid rgba(255, 140, 0, 0.3)',
-            fontFamily: 'Montserrat, sans-serif',
+            maxHeight: 0,
+            opacity: 0,
+            overflow: 'hidden',
+            transition: 'max-height 300ms ease, opacity 250ms ease',
           }}
         >
-          Oportunidade de melhoria
-        </span>
+          <div
+            style={{
+              background: '#FFF5F8',
+              borderTop: '1px solid rgba(255,0,104,0.12)',
+              padding: '12px 20px 16px',
+            }}
+          >
+            <p
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700,
+                fontSize: 12,
+                color: '#FF0068',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                marginBottom: 10,
+              }}
+            >
+              Próximos passos recomendados
+            </p>
+            <div className="flex flex-col gap-2">
+              {dimension.actionPlan.map((step, i) => (
+                <div key={i} className="flex gap-3 items-start">
+                  <span
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      color: '#FF0068',
+                      minWidth: 20,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {i + 1}.
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontWeight: 400,
+                      fontSize: 13,
+                      color: '#333',
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {step}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </motion.div>
   )

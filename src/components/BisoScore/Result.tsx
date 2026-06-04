@@ -1,24 +1,50 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Linkedin } from 'lucide-react'
 import type { ScoreResult } from '../../lib/scoring'
+import { getRevenueAmount } from '../../lib/scoring'
+import { buildShareUrl } from '../../lib/resultHash'
 import { ScoreMeter } from './ScoreMeter'
 import { DimensionCard } from './DimensionCard'
 
 type ResultProps = {
   result: ScoreResult
   leadName: string
+  resultHash: string
+  faturamento: number | null
   onRestart: () => void
 }
 
-export function Result({ result, leadName, onRestart }: ResultProps) {
+const brlFormat = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  maximumFractionDigits: 0,
+})
+
+export function Result({ result, leadName, resultHash, faturamento, onRestart }: ResultProps) {
   const firstName = leadName.split(' ')[0]
+  const [openDimension, setOpenDimension] = useState<string | null>(null)
+
+  function toggleDimension(key: string) {
+    setOpenDimension((prev) => (prev === key ? null : key))
+  }
+
+  const shareUrl = resultHash ? buildShareUrl(resultHash) : 'https://biso.digital'
 
   function shareOnLinkedIn() {
     const text = encodeURIComponent(
-      `Fiz o diagnóstico de maturidade em dados da minha operação de e-commerce e tirei ${result.total}/100 no #BisoScore. Você sabe qual é o score da sua loja? 👉 https://biso.digital`
+      `Fiz o diagnóstico de maturidade em dados da minha operação e tirei ${result.total}/100 no #BisoScore 🎯 Descubra o score da sua loja: ${shareUrl}`
     )
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://biso.digital')}&summary=${text}`, '_blank')
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${text}`,
+      '_blank'
+    )
   }
+
+  // Melhoria 2: receita em reais se faturamento informado
+  const revenueAmountBrl = faturamento != null
+    ? brlFormat.format(getRevenueAmount(result.total, faturamento))
+    : null
 
   return (
     <motion.div
@@ -35,28 +61,21 @@ export function Result({ result, leadName, onRestart }: ResultProps) {
         transition={{ duration: 0.5 }}
         className="card w-full p-8 flex flex-col items-center gap-4 text-center"
       >
-        {/* Level badge */}
         <span
           className="pill"
-          style={{
-            border: `1px solid ${result.levelColor}`,
-            color: result.levelColor,
-          }}
+          style={{ border: `1px solid ${result.levelColor}`, color: result.levelColor }}
         >
           {result.levelEmoji} {result.level} em Dados
         </span>
 
-        {/* Greeting */}
         {firstName && (
           <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 500, fontSize: 15, color: '#888' }}>
             Olá, {firstName}! Aqui está o diagnóstico da sua operação.
           </p>
         )}
 
-        {/* Score meter */}
         <ScoreMeter score={result.total} levelColor={result.levelColor} />
 
-        {/* Diagnosis */}
         <p
           style={{
             fontFamily: 'Montserrat, sans-serif',
@@ -71,16 +90,11 @@ export function Result({ result, leadName, onRestart }: ResultProps) {
         </p>
       </motion.div>
 
-      {/* Dimensions grid */}
+      {/* Dimensions grid — accordion managed here */}
       <div className="w-full">
         <h3
           className="mb-4"
-          style={{
-            fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 700,
-            fontSize: 18,
-            color: '#222',
-          }}
+          style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 18, color: '#222' }}
         >
           Diagnóstico por dimensão
         </h3>
@@ -89,7 +103,13 @@ export function Result({ result, leadName, onRestart }: ResultProps) {
           style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}
         >
           {result.dimensions.map((dim, i) => (
-            <DimensionCard key={dim.key} dimension={dim} index={i} />
+            <DimensionCard
+              key={dim.key}
+              dimension={dim}
+              index={i}
+              isOpen={openDimension === dim.key}
+              onToggle={toggleDimension}
+            />
           ))}
         </div>
       </div>
@@ -120,18 +140,35 @@ export function Result({ result, leadName, onRestart }: ResultProps) {
             >
               Estimativa de receita mensal não capturada
             </h3>
-            <div
-              style={{
-                fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 900,
-                fontSize: 'clamp(28px, 5vw, 40px)',
-                color: '#FF0068',
-                lineHeight: 1.1,
-                marginBottom: 8,
-              }}
-            >
-              {result.revenueEstimate}
-            </div>
+
+            {revenueAmountBrl ? (
+              <div
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 'clamp(28px, 5vw, 36px)',
+                  color: '#FF0068',
+                  lineHeight: 1.1,
+                  marginBottom: 8,
+                }}
+              >
+                ~{revenueAmountBrl}/mês
+              </div>
+            ) : (
+              <div
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 900,
+                  fontSize: 'clamp(28px, 5vw, 40px)',
+                  color: '#FF0068',
+                  lineHeight: 1.1,
+                  marginBottom: 8,
+                }}
+              >
+                {result.revenueEstimate}
+              </div>
+            )}
+
             <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400, fontSize: 13, color: '#666', marginBottom: 10 }}>
               Baseado em resultados médios de clientes Biso com perfil similar ao seu.
             </p>
@@ -177,12 +214,7 @@ export function Result({ result, leadName, onRestart }: ResultProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block rounded-2xl px-8 py-3.5 font-semibold text-base transition-all duration-200 hover:scale-105 active:scale-95"
-          style={{
-            background: '#fff',
-            color: '#FF0068',
-            fontFamily: 'Montserrat, sans-serif',
-            textDecoration: 'none',
-          }}
+          style={{ background: '#fff', color: '#FF0068', fontFamily: 'Montserrat, sans-serif', textDecoration: 'none' }}
         >
           Agendar diagnóstico gratuito com especialista →
         </a>

@@ -9,6 +9,14 @@ import type { LeadData } from './LeadForm'
 import { Result } from './Result'
 import { calculateScore } from '../../lib/scoring'
 import type { QuizAnswers, ScoreResult } from '../../lib/scoring'
+import {
+  generateResultHash,
+  saveResult,
+  loadResult,
+  getHashFromPath,
+  pushResultUrl,
+  type PersistedResult,
+} from '../../lib/resultHash'
 
 type Screen = 'landing' | 'quiz' | 'loading' | 'gate' | 'result'
 
@@ -34,19 +42,42 @@ function clearState() {
   } catch {}
 }
 
+// On mount: check if URL is /resultado/{hash} → load directly
+function tryLoadFromUrl(): { screen: Screen; result: ScoreResult; leadName: string; storeUrl: string; answers: QuizAnswers; resultHash: string; faturamento: number | null } | null {
+  const hash = getHashFromPath()
+  if (!hash) return null
+  const persisted = loadResult(hash)
+  if (!persisted) return null
+  const result = calculateScore(persisted.respostas)
+  return {
+    screen: 'result',
+    result,
+    leadName: persisted.nome,
+    storeUrl: persisted.urlLoja,
+    answers: persisted.respostas,
+    resultHash: persisted.hash,
+    faturamento: persisted.faturamento,
+  }
+}
+
 export function BisoScore() {
-  const saved = loadState()
+  const fromUrl = tryLoadFromUrl()
+  const saved = fromUrl ?? loadState()
 
   const [screen, setScreen] = useState<Screen>(saved?.screen ?? 'landing')
   const [storeUrl, setStoreUrl] = useState<string>(saved?.storeUrl ?? '')
   const [answers, setAnswers] = useState<QuizAnswers | null>(saved?.answers ?? null)
   const [result, setResult] = useState<ScoreResult | null>(saved?.result ?? null)
   const [leadName, setLeadName] = useState<string>(saved?.leadName ?? '')
+  const [resultHash, setResultHash] = useState<string>(saved?.resultHash ?? '')
+  const [faturamento, setFaturamento] = useState<number | null>(saved?.faturamento ?? null)
 
   function goToQuiz(url: string) {
     setStoreUrl(url)
     saveState({ screen: 'quiz', storeUrl: url })
     setScreen('quiz')
+    // Reset URL back to / when starting fresh
+    window.history.replaceState(null, '', '/')
   }
 
   function goToLoading(a: QuizAnswers) {
@@ -62,19 +93,47 @@ export function BisoScore() {
 
   function goToResult(lead: LeadData) {
     const computed = calculateScore(answers!)
+    const hash = generateResultHash(answers!, storeUrl)
+
+    const persisted: PersistedResult = {
+      hash,
+      score: computed.total,
+      nivel: computed.level,
+      respostas: answers!,
+      urlLoja: storeUrl,
+      nome: lead.nome,
+      faturamento: lead.faturamento,
+      timestamp: new Date().toISOString(),
+    }
+    saveResult(persisted)
+    pushResultUrl(hash)
+
     setResult(computed)
     setLeadName(lead.nome)
-    saveState({ screen: 'result', storeUrl, answers, result: computed, leadName: lead.nome })
+    setResultHash(hash)
+    setFaturamento(lead.faturamento)
+    saveState({
+      screen: 'result',
+      storeUrl,
+      answers,
+      result: computed,
+      leadName: lead.nome,
+      resultHash: hash,
+      faturamento: lead.faturamento,
+    })
     setScreen('result')
   }
 
   function restart() {
     clearState()
+    window.history.replaceState(null, '', '/')
     setScreen('landing')
     setStoreUrl('')
     setAnswers(null)
     setResult(null)
     setLeadName('')
+    setResultHash('')
+    setFaturamento(null)
   }
 
   return (
@@ -114,6 +173,8 @@ export function BisoScore() {
               key="result"
               result={result}
               leadName={leadName}
+              resultHash={resultHash}
+              faturamento={faturamento}
               onRestart={restart}
             />
           )}
