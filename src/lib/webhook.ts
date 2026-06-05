@@ -5,6 +5,7 @@ export type WebhookPayload = {
   email: string
   empresa: string
   telefone: string
+  vertical: string
   plataforma: string
   faturamento: number | null
   url_loja: string

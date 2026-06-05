@@ -188,9 +188,9 @@ export function Landing({ onStart, initialUrl }: LandingProps) {
         className="flex flex-col items-center gap-2"
       >
         <p className="text-xs uppercase tracking-widest" style={{ color: '#bbb', fontWeight: 600 }}>
-          Confiado por marcas como
+          Parte da jornada de <span style={{ color: '#FF0068', fontWeight: 700 }}>250+ marcas</span> do varejo
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mt-1">
           {brands.map((b, i) => (
             <span key={b} className="flex items-center gap-3">
               <span style={{ color: '#ccc', fontWeight: 500, fontSize: 13 }}>{b}</span>

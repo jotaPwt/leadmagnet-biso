@@ -172,9 +172,17 @@ export function Result({ result, leadName, resultHash, faturamento, onRestart }:
             <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400, fontSize: 13, color: '#666', marginBottom: 10 }}>
               Baseado em resultados médios de clientes Biso com perfil similar ao seu.
             </p>
-            <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 12, color: '#FF8C00' }}>
-              Toy Mania: +38% em vendas&nbsp;&nbsp;|&nbsp;&nbsp;Scavone: +248% de receita anual
-            </p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {[
+                'Toy Mania: +38% em vendas',
+                'Scavone: +248% receita anual',
+                'Bom Pastor: +41% ticket médio',
+              ].map((c) => (
+                <span key={c} style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 12, color: '#FF8C00' }}>
+                  {c}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </motion.div>
@@ -224,6 +232,54 @@ export function Result({ result, leadName, resultHash, faturamento, onRestart }:
         >
           Sem compromisso · Dura 30 minutos · Feito por especialistas em varejo
         </p>
+      </motion.div>
+
+      {/* Integrations section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.8 }}
+        className="w-full card p-6"
+      >
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, color: '#222' }}>
+            A Biso conecta com a sua stack em até 5 minutos, sem depender de TI
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {[
+              'VTEX', 'Shopify', 'Nuvemshop', 'WooCommerce', 'Tray',
+              'Meta Ads', 'Google Analytics', 'Google Ads', 'MongoDB', 'Linx',
+            ].map((integration) => (
+              <span
+                key={integration}
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 600,
+                  fontSize: 12,
+                  color: '#555',
+                  background: '#F2F2F2',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  padding: '5px 12px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {integration}
+              </span>
+            ))}
+            <span
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 500,
+                fontSize: 12,
+                color: '#FF0068',
+                padding: '5px 4px',
+              }}
+            >
+              +50 integrações
+            </span>
+          </div>
+        </div>
       </motion.div>
 
       {/* Share + Restart */}

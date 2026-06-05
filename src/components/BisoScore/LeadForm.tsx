@@ -17,9 +17,19 @@ export type LeadData = {
   email: string
   empresa: string
   telefone: string
+  vertical: string
   plataforma: string
   faturamento: number | null
 }
+
+const VERTICALS = [
+  'E-commerce B2C',
+  'E-commerce B2B',
+  'Omnichannel (online + físico)',
+  'Marketplace',
+  'App de varejo',
+  'Loja física com e-commerce',
+]
 
 const PLATFORMS = ['Shopify', 'VTEX', 'Nuvemshop', 'WooCommerce', 'Tray', 'Outro']
 
@@ -37,6 +47,7 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
     email: '',
     empresa: '',
     telefone: '',
+    vertical: '',
     plataforma: '',
     faturamento: null,
   })
@@ -69,6 +80,7 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
       email: form.email,
       empresa: form.empresa,
       telefone: form.telefone,
+      vertical: form.vertical || 'Não informado',
       plataforma: form.plataforma || 'Não informado',
       faturamento: form.faturamento,
       url_loja: storeUrl,
@@ -160,6 +172,20 @@ export function LeadForm({ storeUrl, answers, scoreTotal, nivel, onSubmit }: Lea
               value={form.telefone}
               onChange={(e) => set('telefone', e.target.value)}
             />
+          </Field>
+
+          <Field label="Tipo de operação">
+            <select
+              className="input-field"
+              value={form.vertical}
+              onChange={(e) => set('vertical', e.target.value)}
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="">Selecione seu modelo</option>
+              {VERTICALS.map((v) => (
+                <option key={v} value={v}>{v}</option>
+              ))}
+            </select>
           </Field>
 
           <Field label="Faturamento mensal aproximado" hint="opcional">

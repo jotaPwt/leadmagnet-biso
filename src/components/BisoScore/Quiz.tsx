@@ -5,16 +5,18 @@ import type { QuizAnswers } from '../../lib/scoring'
 
 type Question = {
   id: keyof QuizAnswers
-  title: string
-  subtitle: string
+  pilar: string     // Nome do pilar Biso
+  subtitle: string  // Descrição técnica
+  question: string
   options: { label: string; points: number }[]
 }
 
 const QUESTIONS: Question[] = [
   {
     id: 'q1',
-    title: 'Unificação de dados',
-    subtitle: 'Seus dados de vendas online e offline estão centralizados em uma única ferramenta?',
+    pilar: 'Conecte',
+    subtitle: 'Integração de dados',
+    question: 'Seus dados de vendas online e offline estão centralizados em uma única ferramenta?',
     options: [
       { label: 'Sim, totalmente', points: 4 },
       { label: 'Parcialmente', points: 2 },
@@ -23,28 +25,31 @@ const QUESTIONS: Question[] = [
   },
   {
     id: 'q2',
-    title: 'Visibilidade em tempo real',
-    subtitle: 'Com que frequência você monitora os KPIs da sua operação?',
+    pilar: 'Visualize',
+    subtitle: 'Monitoramento em tempo real',
+    question: 'Com que frequência você monitora os KPIs da sua operação?',
     options: [
-      { label: 'Diariamente com alertas automáticos', points: 4 },
+      { label: 'Diariamente com dashboards automáticos', points: 4 },
       { label: 'Semanalmente em reuniões', points: 2 },
       { label: 'Quando tem algum problema', points: 0 },
     ],
   },
   {
-    id: 'q3',
-    title: 'Uso de alertas automáticos',
-    subtitle: 'Você recebe avisos automáticos quando algo está fora do padrão (queda de conversão, anomalia de receita, etc.)?',
+    id: 'q5',
+    pilar: 'Analise',
+    subtitle: 'Capacidade analítica',
+    question: 'Quando você precisa de um dado específico da operação, como obtém?',
     options: [
-      { label: 'Sim, configurados e funcionando', points: 4 },
-      { label: 'Tenho alguns alertas básicos', points: 2 },
-      { label: 'Não tenho alertas automáticos', points: 0 },
+      { label: 'Peço aos dados em linguagem natural / BI próprio', points: 4 },
+      { label: 'Exporto planilhas e analiso manualmente', points: 2 },
+      { label: 'Espero o relatório mensal do time', points: 0 },
     ],
   },
   {
     id: 'q4',
-    title: 'Inteligência de CRM',
-    subtitle: 'Como você usa os dados de clientes para personalizar comunicação e aumentar recorrência?',
+    pilar: 'Crie',
+    subtitle: 'Inteligência de CRM',
+    question: 'Como você usa os dados de clientes para personalizar comunicação e aumentar recorrência?',
     options: [
       { label: 'Segmentação avançada com dados comportamentais', points: 4 },
       { label: 'Segmentações básicas por RFM', points: 2 },
@@ -52,13 +57,14 @@ const QUESTIONS: Question[] = [
     ],
   },
   {
-    id: 'q5',
-    title: 'Capacidade analítica',
-    subtitle: 'Quando você precisa de um dado específico da operação, como obtém?',
+    id: 'q3',
+    pilar: 'Execute',
+    subtitle: 'Alertas e automações',
+    question: 'Você recebe avisos automáticos quando algo está fora do padrão (queda de conversão, anomalia de receita)?',
     options: [
-      { label: 'Peço aos dados em linguagem natural / BI próprio', points: 4 },
-      { label: 'Exporto planilhas e analiso manualmente', points: 2 },
-      { label: 'Espero o relatório mensal do time', points: 0 },
+      { label: 'Sim, alertas configurados e funcionando', points: 4 },
+      { label: 'Tenho alguns alertas básicos', points: 2 },
+      { label: 'Não tenho alertas automáticos', points: 0 },
     ],
   },
 ]
@@ -92,6 +98,15 @@ export function Quiz({ onComplete, initialAnswers }: QuizProps) {
     }
   }
 
+  // Cores dos pilares Biso
+  const pilarColors: Record<string, string> = {
+    Conecte: '#FF0068',
+    Visualize: '#FF0068',
+    Analise: '#FF0068',
+    Crie: '#FF0068',
+    Execute: '#FF0068',
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 60 }}
@@ -104,7 +119,7 @@ export function Quiz({ onComplete, initialAnswers }: QuizProps) {
       {/* Progress bar */}
       <div className="w-full mb-8">
         <div className="flex justify-between text-xs font-medium mb-2" style={{ color: '#888' }}>
-          <span>Pergunta {currentIndex + 1} de {QUESTIONS.length}</span>
+          <span>Pilar {currentIndex + 1} de {QUESTIONS.length}</span>
           <span style={{ color: '#FF0068' }}>{Math.round(progress)}%</span>
         </div>
         <div className="progress-bar-track">
@@ -114,6 +129,47 @@ export function Quiz({ onComplete, initialAnswers }: QuizProps) {
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
+        </div>
+
+        {/* Pilares indicator */}
+        <div className="flex justify-between mt-3">
+          {QUESTIONS.map((q, i) => (
+            <div key={q.pilar} className="flex flex-col items-center gap-1">
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: i < currentIndex ? '#FF0068' : i === currentIndex ? '#FFF0F5' : '#F2F2F2',
+                  border: i === currentIndex ? '2px solid #FF0068' : i < currentIndex ? 'none' : '1.5px solid #e5e7eb',
+                  transition: 'all 0.3s',
+                  fontSize: 11,
+                }}
+              >
+                {i < currentIndex ? (
+                  <span style={{ color: '#fff', fontWeight: 700, fontSize: 10 }}>✓</span>
+                ) : (
+                  <span style={{ color: i === currentIndex ? '#FF0068' : '#bbb', fontWeight: 700, fontSize: 9 }}>
+                    {i + 1}
+                  </span>
+                )}
+              </div>
+              <span
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 9,
+                  fontWeight: i === currentIndex ? 700 : 500,
+                  color: i === currentIndex ? '#FF0068' : i < currentIndex ? '#888' : '#ccc',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {q.pilar}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -127,20 +183,33 @@ export function Quiz({ onComplete, initialAnswers }: QuizProps) {
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="w-full"
         >
-          <div className="mb-2">
-            <span className="pill text-xs">{question.title}</span>
+          {/* Pilar pill */}
+          <div className="mb-3 flex items-center gap-2">
+            <span
+              className="pill text-xs"
+              style={{
+                border: `1px solid ${pilarColors[question.pilar]}`,
+                color: pilarColors[question.pilar],
+              }}
+            >
+              {question.pilar}
+            </span>
+            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#aaa', fontWeight: 500 }}>
+              {question.subtitle}
+            </span>
           </div>
+
           <h2
-            className="mb-6 mt-3"
+            className="mb-6"
             style={{
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 700,
-              fontSize: 'clamp(18px, 3vw, 22px)',
+              fontSize: 'clamp(17px, 3vw, 21px)',
               color: '#222',
               lineHeight: 1.45,
             }}
           >
-            {question.subtitle}
+            {question.question}
           </h2>
 
           <div className="flex flex-col gap-3 mb-8">
@@ -202,7 +271,7 @@ export function Quiz({ onComplete, initialAnswers }: QuizProps) {
             className="btn-primary w-full sm:w-auto text-base"
             style={{ minWidth: 220, height: 50 }}
           >
-            {isLast ? 'Ver meu Score →' : 'Próxima →'}
+            {isLast ? 'Ver meu Score →' : 'Próximo pilar →'}
           </motion.button>
         )}
       </AnimatePresence>

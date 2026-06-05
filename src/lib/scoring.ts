@@ -21,7 +21,8 @@ export type ScoreResult = {
 
 export type DimensionResult = {
   key: string
-  name: string
+  name: string        // Pilar Biso: Conecte, Visualize, Analise, Crie, Execute
+  subtitle: string    // Descrição técnica da dimensão
   icon: string
   score: number
   maxScore: number
@@ -38,11 +39,13 @@ export function calculateScore(answers: QuizAnswers): ScoreResult {
   const { levelColor, levelEmoji, diagnosis } = getLevelMeta(level)
   const { revenueEstimate, revenuePercent } = getRevenueEstimate(total)
 
+  // Mapeamento para os 5 pilares da Biso em ordem canônica
   const dimensions: DimensionResult[] = [
     {
       key: 'q1',
-      name: 'Unificação de Dados',
-      icon: '🗄️',
+      name: 'Conecte',
+      subtitle: 'Integração de dados',
+      icon: '🔗',
       score: answers.q1,
       maxScore: 4,
       insight: getDimensionInsight('q1', answers.q1),
@@ -51,7 +54,8 @@ export function calculateScore(answers: QuizAnswers): ScoreResult {
     },
     {
       key: 'q2',
-      name: 'Monitoramento em Tempo Real',
+      name: 'Visualize',
+      subtitle: 'Monitoramento em tempo real',
       icon: '📊',
       score: answers.q2,
       maxScore: 4,
@@ -60,19 +64,21 @@ export function calculateScore(answers: QuizAnswers): ScoreResult {
       actionPlan: getActionPlan('q2', answers.q2),
     },
     {
-      key: 'q3',
-      name: 'Alertas Automáticos',
-      icon: '🔔',
-      score: answers.q3,
+      key: 'q5',
+      name: 'Analise',
+      subtitle: 'Capacidade analítica',
+      icon: '🔍',
+      score: answers.q5,
       maxScore: 4,
-      insight: getDimensionInsight('q3', answers.q3),
-      hasOpportunity: answers.q3 < 4,
-      actionPlan: getActionPlan('q3', answers.q3),
+      insight: getDimensionInsight('q5', answers.q5),
+      hasOpportunity: answers.q5 < 4,
+      actionPlan: getActionPlan('q5', answers.q5),
     },
     {
       key: 'q4',
-      name: 'Inteligência de CRM',
-      icon: '👥',
+      name: 'Crie',
+      subtitle: 'Inteligência de CRM',
+      icon: '✨',
       score: answers.q4,
       maxScore: 4,
       insight: getDimensionInsight('q4', answers.q4),
@@ -80,14 +86,15 @@ export function calculateScore(answers: QuizAnswers): ScoreResult {
       actionPlan: getActionPlan('q4', answers.q4),
     },
     {
-      key: 'q5',
-      name: 'Capacidade Analítica',
-      icon: '🤖',
-      score: answers.q5,
+      key: 'q3',
+      name: 'Execute',
+      subtitle: 'Alertas e automações',
+      icon: '⚡',
+      score: answers.q3,
       maxScore: 4,
-      insight: getDimensionInsight('q5', answers.q5),
-      hasOpportunity: answers.q5 < 4,
-      actionPlan: getActionPlan('q5', answers.q5),
+      insight: getDimensionInsight('q3', answers.q3),
+      hasOpportunity: answers.q3 < 4,
+      actionPlan: getActionPlan('q3', answers.q3),
     },
   ]
 
@@ -153,29 +160,29 @@ function getRevenueEstimate(total: number): { revenueEstimate: string; revenuePe
 function getDimensionInsight(key: string, score: number): string {
   const insights: Record<string, Record<number, string>> = {
     q1: {
-      0: 'Dados espalhados em múltiplas ferramentas geram pontos cegos e decisões lentas. Centralização é o primeiro passo.',
-      2: 'Você tem alguma integração, mas silos de dados ainda custam tempo e precisão nas análises.',
-      4: 'Excelente! Dados unificados permitem visão 360° da sua operação.',
+      0: 'Dados espalhados em múltiplas ferramentas geram pontos cegos e decisões lentas. Conectar suas fontes é o primeiro passo para operar com inteligência.',
+      2: 'Você tem alguma integração, mas silos de dados ainda custam tempo e precisão. Sem conexão total, você só enxerga parte da operação.',
+      4: 'Excelente! Com todas as fontes conectadas, você tem a base necessária para visualizar e agir com precisão.',
     },
     q2: {
-      0: 'Reagir a problemas quando surgem é caro. Monitoramento contínuo pode prevenir crises silenciosas.',
-      2: 'Reuniões semanais podem ser tarde demais. Oportunidades e problemas acontecem em horas, não semanas.',
-      4: 'Perfeito! Visibilidade diária com alertas é o padrão das operações de alta performance.',
+      0: 'Reagir a problemas quando surgem é caro. Dashboards em tempo real permitem antecipar crises antes que elas afetem a receita.',
+      2: 'Reuniões semanais podem ser tarde demais. Oportunidades e problemas acontecem em horas — sua visibilidade precisa acompanhar.',
+      4: 'Perfeito! Visibilidade em tempo real é o padrão das operações de alta performance.',
     },
     q3: {
-      0: 'Sem alertas automáticos, problemas como queda de conversão podem passar dias sem atenção.',
-      2: 'Alguns alertas ajudam, mas uma cobertura completa protege toda a receita da operação.',
-      4: 'Sua operação está protegida. Alertas inteligentes são o sistema imunológico do e-commerce.',
+      0: 'Sem alertas automáticos, anomalias de conversão e receita podem passar dias sem atenção — e cada hora custa.',
+      2: 'Alguns alertas ajudam, mas cobertura parcial ainda deixa brechas. Uma camada de execução automatizada protege toda a operação.',
+      4: 'Sua operação está protegida. Alertas e automações são o sistema imunológico do e-commerce moderno.',
     },
     q4: {
-      0: 'Enviar a mesma mensagem para toda a base é um dos maiores desperdícios de receita no varejo.',
-      2: 'RFM é um bom começo, mas comportamento de navegação e compra permite segmentações muito mais rentáveis.',
-      4: 'Segmentação avançada é um dos maiores diferenciais competitivos no varejo digital. Continue assim!',
+      0: 'Enviar a mesma mensagem para toda a base é um dos maiores desperdícios de receita no varejo. Personalização começa com dados.',
+      2: 'RFM é um bom ponto de partida, mas comportamento de navegação e compra permite segmentações muito mais rentáveis.',
+      4: 'Segmentação avançada com dados comportamentais é um dos maiores diferenciais competitivos. Continue assim!',
     },
     q5: {
-      0: 'Esperar relatórios mensais significa tomar decisões com dados velhos. Agilidade analítica é vantagem competitiva.',
-      2: 'Planilhas manuais escalam mal e introduzem erros. Cada hora nisso é uma hora longe de estratégia.',
-      4: 'Acesso instantâneo a dados em linguagem natural é o futuro — e você já está lá.',
+      0: 'Esperar relatórios mensais significa decidir com dados velhos. Agilidade analítica é vantagem competitiva no varejo atual.',
+      2: 'Planilhas manuais escalam mal e introduzem erros. Cada hora extraindo dados é uma hora longe de estratégia.',
+      4: 'Acesso instantâneo a dados em linguagem natural é o futuro — e você já chegou lá.',
     },
   }
   return insights[key][score] ?? insights[key][0]
@@ -186,11 +193,11 @@ function getActionPlan(key: string, score: number): string[] {
     q1: {
       0: [
         'Mapeie todas as fontes de dados da sua operação (ERP, plataforma, ads, CRM)',
-        'Escolha uma plataforma central para consolidar os dados — evite planilhas',
+        'Escolha uma plataforma central para consolidar os dados — evite planilhas como solução permanente',
         'Comece pela integração entre sua loja online e os dados de mídia paga',
       ],
       2: [
-        'Identifique quais fontes ainda estão desconectadas e qual impacto têm',
+        'Identifique quais fontes ainda estão desconectadas e qual impacto financeiro geram',
         'Priorize a integração dos canais que mais geram receita',
         'Defina um único "lugar da verdade" para métricas de negócio',
       ],
@@ -199,13 +206,13 @@ function getActionPlan(key: string, score: number): string[] {
     q2: {
       0: [
         'Defina os 5 KPIs mais críticos da sua operação para monitorar diariamente',
-        'Configure um dashboard simples com atualização automática',
-        'Estabeleça uma rotina diária de 10 min para revisão de métricas',
+        'Configure um dashboard com atualização automática e compartilhe com o time',
+        'Estabeleça uma rotina diária de 10 min para revisão de métricas-chave',
       ],
       2: [
-        'Migre a revisão de métricas de semanal para diária — use alertas por email/WhatsApp',
-        'Identifique quais anomalias poderiam ser detectadas antes das reuniões',
-        'Automatize o envio do resumo diário de KPIs para o time',
+        'Migre a revisão de métricas de semanal para diária — use alertas por email ou WhatsApp',
+        'Identifique quais anomalias poderiam ser detectadas antes das reuniões semanais',
+        'Automatize o envio do resumo diário de KPIs para gestores e operadores',
       ],
       4: [],
     },
@@ -216,9 +223,9 @@ function getActionPlan(key: string, score: number): string[] {
         'Crie alertas de ruptura de estoque nos SKUs mais vendidos',
       ],
       2: [
-        'Expanda os alertas para cobrir toda a jornada do cliente, não só vendas',
+        'Expanda os alertas para cobrir toda a jornada do cliente, não só vendas finalizadas',
         'Adicione alertas de performance de mídia paga (ROAS abaixo do target)',
-        'Configure alertas de comportamento anômalo de CRM (queda em recompra)',
+        'Configure notificações de comportamento anômalo de CRM (queda em recompra)',
       ],
       4: [],
     },
@@ -226,24 +233,24 @@ function getActionPlan(key: string, score: number): string[] {
       0: [
         'Segmente sua base minimamente em 3 grupos: novos, ativos e inativos',
         'Crie uma régua básica de reativação para clientes sem compra há 90 dias',
-        'Personalize pelo menos a linha de assunto com o nome do cliente',
+        'Personalize pelo menos a linha de assunto dos emails com o nome do cliente',
       ],
       2: [
         'Avance para segmentação comportamental: o que cada segmento browseou mas não comprou',
-        'Implemente triggers baseados em comportamento de navegação, não só em compras',
-        'Crie audiências lookalike baseadas no seu top 10% de clientes por LTV',
+        'Implemente triggers baseados em comportamento de navegação, não só em histórico de compras',
+        'Crie audiências lookalike baseadas no top 10% de clientes por LTV',
       ],
       4: [],
     },
     q5: {
       0: [
-        'Elimine a dependência de relatórios mensais — dados mensais são dados velhos',
-        'Capacite seu time com acesso direto a dashboards operacionais',
-        'Defina quais decisões precisam de dados e qual é a frequência necessária',
+        'Elimine a dependência de relatórios mensais — dados mensais são dados velhos demais para varejo',
+        'Capacite seu time com acesso direto a dashboards operacionais sem depender de TI',
+        'Defina quais decisões precisam de dados e com qual frequência elas precisam ser tomadas',
       ],
       2: [
         'Calcule quanto tempo seu time gasta por semana extraindo e formatando planilhas',
-        'Automatize as extrações mais recorrentes para liberar tempo analítico',
+        'Automatize as extrações mais recorrentes para liberar tempo analítico da equipe',
         'Invista em ferramentas que permitam perguntar aos dados em linguagem natural',
       ],
       4: [],
