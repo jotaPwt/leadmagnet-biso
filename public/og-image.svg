@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#F8F8F8"/>
+
+  <!-- Left accent bar -->
+  <rect x="0" y="0" width="8" height="630" fill="#FF0068"/>
+
+  <!-- Bottom accent -->
+  <rect x="0" y="590" width="1200" height="40" fill="#FF0068" opacity="0.06"/>
+
+  <!-- Pink glow circle -->
+  <circle cx="980" cy="120" r="280" fill="#FF0068" opacity="0.05"/>
+
+  <!-- Card background -->
+  <rect x="80" y="80" width="660" height="470" rx="24" fill="white"
+        filter="url(#shadow)"/>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="16" flood-color="#FF0068" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+
+  <!-- Pill -->
+  <rect x="120" y="128" width="230" height="36" rx="18" fill="none" stroke="#FF0068" stroke-width="1.5"/>
+  <text x="235" y="151" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="600"
+        fill="#FF0068" text-anchor="middle">✦ Diagnóstico gratuito · 2 min</text>
+
+  <!-- Main headline -->
+  <text x="120" y="230" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="800"
+        fill="#FF0068">Descubra o Biso Score</text>
+  <text x="120" y="285" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="800"
+        fill="#222222">da sua loja</text>
+
+  <!-- Subtitle -->
+  <text x="120" y="338" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="400"
+        fill="#555555">Avalie sua maturidade em dados nos 5 pilares</text>
+  <text x="120" y="362" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="400"
+        fill="#555555">do varejo e descubra o que está perdendo.</text>
+
+  <!-- 5 pilars pills -->
+  <g transform="translate(120, 410)">
+    <!-- Conecte -->
+    <rect width="100" height="32" rx="16" fill="#FF0068" opacity="0.1"/>
+    <text x="50" y="21" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700"
+          fill="#FF0068" text-anchor="middle">Conecte</text>
+    <!-- Visualize -->
+    <rect x="112" width="110" height="32" rx="16" fill="#FF0068" opacity="0.1"/>
+    <text x="167" y="21" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700"
+          fill="#FF0068" text-anchor="middle">Visualize</text>
+    <!-- Analise -->
+    <rect x="234" width="100" height="32" rx="16" fill="#FF0068" opacity="0.1"/>
+    <text x="284" y="21" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700"
+          fill="#FF0068" text-anchor="middle">Analise</text>
+    <!-- Crie -->
+    <rect x="346" width="76" height="32" rx="16" fill="#FF0068" opacity="0.1"/>
+    <text x="384" y="21" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700"
+          fill="#FF0068" text-anchor="middle">Crie</text>
+    <!-- Execute -->
+    <rect x="434" width="104" height="32" rx="16" fill="#FF0068" opacity="0.1"/>
+    <text x="486" y="21" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700"
+          fill="#FF0068" text-anchor="middle">Execute</text>
+  </g>
+
+  <!-- Right side: Score visual -->
+  <text x="970" y="290" font-family="Montserrat, Arial, sans-serif" font-size="160" font-weight="900"
+        fill="#FF0068" opacity="0.12" text-anchor="middle">?</text>
+  <text x="970" y="340" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="700"
+        fill="#888" text-anchor="middle">Qual é o seu score?</text>
+
+  <!-- Progress bar decoration -->
+  <rect x="840" y="370" width="260" height="10" rx="5" fill="#FF0068" opacity="0.1"/>
+  <rect x="840" y="370" width="130" height="10" rx="5" fill="#FF0068" opacity="0.4"/>
+
+  <!-- Cases -->
+  <text x="840" y="440" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="600"
+        fill="#FF8C00">Toy Mania +38% vendas</text>
+  <text x="840" y="462" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="600"
+        fill="#FF8C00">Scavone +248% receita anual</text>
+  <text x="840" y="484" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="600"
+        fill="#FF8C00">Bom Pastor +41% ticket médio</text>
+
+  <!-- Footer: biso.digital -->
+  <text x="600" y="616" font-family="Montserrat, Arial, sans-serif" font-size="15" font-weight="600"
+        fill="#FF0068" text-anchor="middle" opacity="0.7">biso.digital</text>
+</svg>
